@@ -91,7 +91,7 @@
       ]
     },
     c2_b4: {
-      scale: 1.05,
+      scale: 0.95,
       name: '결투제 결승 — 학생회장 율리안', tier: 'boss', bg: 'arena_final', level: 3,
       enemies: ['julian'], maxParty: 3, forced: ['lennox'], reward: 8,
       intro: '율리안은 빠르고, 느린 공격을 가로챈다. 체력 50% 이하에서 검집을 벗는다.',
@@ -170,7 +170,7 @@
       events: [{ turn: 1, speaker: '장부의 집행관', text: '【성객 회수 중. 열람자는 물러나십시오.】' }]
     },
     c4_b5: {
-      scale: 1.2,
+      scale: 1.05,
       name: '관리인 오스왈드 벨그레이브', tier: 'boss', bg: 'clocktower_top', level: 5,
       enemies: ['belgrave'], maxParty: 4, forced: ['lennox'], reward: 10,
       mods: [{ if: 'flag.julian_ally', enemy: 'belgrave', hpMult: 0.85 }],
@@ -210,7 +210,7 @@
       ]
     },
     c5_b5: {
-      scale: 1.2,
+      scale: 1.1,
       name: '별의 장부', tier: 'boss', bg: 'ledger_heart', level: 6,
       enemies: ['ledger_quill', 'ledger', 'ledger_ink'], maxParty: 4, forced: ['lennox'], reward: 0,
       mods: [

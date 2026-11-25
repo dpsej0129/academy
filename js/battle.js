@@ -56,6 +56,12 @@
     var self = this, level = this.def.level || 1;
     (opts.party || []).forEach(function (p) { self._addAlly(p, level); });
     var mods = (this.def.mods || []).filter(function (m) { return self.check(m.if); });
+    // 이탈·사망으로 인원이 모자라면 적 체력을 줄이고(1명당 20%) 아군 시작 심지를 올린다(1명당 +6)
+    var cap = this.def.fixed ? this.def.fixed.length : (this.def.maxParty || 4);
+    this.shortHanded = Math.max(0, cap - (opts.party || []).length);
+    var sh = Math.min(2, this.shortHanded);
+    this.def = Object.assign({}, this.def, { scale: (this.def.scale || 1) * (1 - 0.2 * sh) });
+    if (sh) this.allies().forEach(function (u) { u.resolve = U.clamp(u.resolve + 6 * sh, C.RES_MIN, C.RES_MAX); });
     this.def.enemies.forEach(function (entry) { self._addEnemy(entry, mods); });
     // 부위 연결
     this.units.forEach(function (u) {

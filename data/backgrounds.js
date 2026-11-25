@@ -19,6 +19,7 @@
     infirmary:         { name: '신성과 치유동', color: '#c7c0ac' },
     ballroom:          { name: '대강당 · 환영 무도회', color: '#6a4b2a' },
     ballroom_garden:   { name: '대강당 뒤뜰', color: '#1f2e24' },
+    ballroom_ruin:     { name: '무너지는 대강당 · 겨울 무도회', color: '#4a4f5e' },
     lake_day:          { name: '거울 호수', color: '#5d86a6' },
     lake_night:        { name: '거울 호수 · 밤', color: '#132036' },
     arena:             { name: '원형 결투장 「붉은 원」', color: '#7a4a35' },

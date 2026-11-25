@@ -49,6 +49,7 @@ ops.forEach((op) => {
     }
   }
 });
+Object.keys(D.battles).forEach((b) => { if (!D.backgrounds[D.battles[b].bg]) errors.push(`전투 ${b}의 배경 ${D.battles[b].bg} 없음`); });
 Object.keys(script.labels).forEach((l) => { if (!l.startsWith('__start_') && !labelsUsed.has(l)) warns.push(`사용되지 않는 라벨: ${l}`); });
 Object.keys(unknownSpeakers).forEach((n) => warns.push(`등록되지 않은 화자 '${n}' ×${unknownSpeakers[n]} (나레이션이 잘못 파싱됐을 수 있음)`));
 
@@ -82,6 +83,18 @@ function playthrough(pick) {
   return null;
 }
 const strategies = [];
+// 트루 엔딩 루트: 선택지의 점프 대상 라벨로 고른다
+const TRUE_ROUTE = ['p_viv_polite', 'c1_mir_warm', 'c1_ball_apology', 'c1_team', 'c1_name_finn', 'c2_kai_keep', 'c2_mirror_touch',
+  'c2_registry', 'c2_jul_ally', 'c3_watch_kai', 'c3_rol_trust', 'c3_eleanor', 'c3_ser_hand', 'c4_hester_name', 'c4_mir_truth',
+  'c4_dance_viv', 'c4_go_roland', 'c5_promise_names', 'c5_name_kang', 'c5_rewrite'];
+function routeBy(prefer) { return (o) => o.find((x) => prefer.includes(x.target)) || o[0]; }
+strategies.push(['true(롤랑에게 맡김)', routeBy(TRUE_ROUTE)]);
+strategies.push(['true(시계탑, 카이엔 사망)', routeBy(TRUE_ROUTE.map((t) => t === 'c4_go_roland' ? 'c4_go_tower' : t).concat(['c3_watch_ser', 'c4_dance_ser']))]);
+strategies.push(['true(거짓말, 롤랑 폭로)', routeBy(TRUE_ROUTE.map((t) => ({ c4_mir_truth: 'c4_mir_lie', c3_rol_trust: 'c3_rol_expose', c4_go_roland: 'c4_go_tower', c4_dance_viv: 'c4_dance_kai' })[t] || t))]);
+strategies.push(['rewrite 실패(이름 4개)', routeBy(TRUE_ROUTE.map((t) => t === 'c3_eleanor' ? 'c3_blueprint' : t))]);
+strategies.push(['rewrite 실패(세라핀 납치)', routeBy(TRUE_ROUTE.map((t) => t === 'c4_go_roland' ? 'c4_go_dorm' : t))]);
+strategies.push(['배신·거짓말 루트', routeBy(['p_viv_rude', 'c1_mir_cold', 'c1_ball_mock', 'c1_duel', 'c1_noname_finn', 'c2_kai_report', 'c2_mirror_turn', 'c2_tea', 'c2_jul_crush', 'c3_watch_rol', 'c3_rol_ignore', 'c3_blueprint', 'c3_read_more', 'c4_hester_skip', 'c4_mir_lie', 'c4_dance_kai', 'c4_go_tower', 'c5_promise_live', 'c5_name_none', 'ep_normal'])]);
+strategies.push(['폭로 루트', routeBy(['c3_rol_expose', 'c3_watch_mir', 'c4_dance_mir', 'c5_name_ardin', 'c5_name_doyun', 'ep_bad'])]);
 strategies.push(['first', (o) => o[0]]);
 strategies.push(['last', (o) => o[o.length - 1]]);
 for (let i = 0; i < runs; i++) { const r = rng(i + 1); strategies.push(['random' + i, (o) => o[Math.floor(r() * o.length)]]); }
@@ -115,7 +128,10 @@ if (perRun.length) {
   console.log(`\n플레이스루 ${perRun.length}회: 엔딩 분포 ${JSON.stringify(endings)}`);
   console.log(`1회당 표시 줄 수 평균 ${avg('lines').toFixed(0)} (최소 ${mn('lines')}, 최대 ${mx('lines')}), 글자 ${avg('chars').toFixed(0)}`);
   console.log(`1회당 전투 평균 ${avg('battles').toFixed(1)} (최소 ${mn('battles')}, 최대 ${mx('battles')}), 보스 ${avg('bosses').toFixed(1)}, 선택 ${avg('choices').toFixed(1)}회`);
-  Object.keys(named).forEach((n) => console.log(`  [${n}] 엔딩=${named[n].ending} 줄=${named[n].lines} 전투=${named[n].battles} 이름=${named[n].state.names.length}`));
+  Object.keys(named).forEach((n) => console.log(`  [${n}] 엔딩=${named[n].ending} 줄=${named[n].lines} 전투=${named[n].battles} 보스=${named[n].bosses} 이름=${named[n].state.names.length} 파티=${named[n].state.party.members.join('/')}`));
+  if (!named['true(롤랑에게 맡김)'] || named['true(롤랑에게 맡김)'].ending !== 'true') errors.push('트루 엔딩 루트가 트루 엔딩에 도달하지 못함');
+  if (!named['rewrite 실패(이름 4개)'] || named['rewrite 실패(이름 4개)'].ending !== 'normal') errors.push('이름 4개로 다시 쓰기가 실패하지 않음');
+  if (!named['rewrite 실패(세라핀 납치)'] || named['rewrite 실패(세라핀 납치)'].ending !== 'normal') errors.push('세라핀 납치 상태로 다시 쓰기가 실패하지 않음');
 }
 console.log(`\n방문하지 못한 대사 ${unvisited.length}줄` + (unvisited.length ? ': ' + unvisited.slice(0, 8).map(([o]) => o.where).join(', ') + (unvisited.length > 8 ? ' …' : '') : ''));
 if (warns.length) { console.log('\n경고'); warns.slice(0, 40).forEach((w) => console.log('  - ' + w)); }

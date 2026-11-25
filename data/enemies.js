@@ -93,7 +93,7 @@
     le_strike: { name: '집행', element: 'thunder', base: 9, lamps: 1, bonus: 7 },
     bel_quill: { name: '관리인의 펜', element: 'lumen', base: 6, lamps: 3, bonus: 3 },
     bel_erase: { name: '삭제', element: 'umbra', base: 5, lamps: 2, bonus: 4, desc: '적중 시 침식 2.', effects: [hit('erosion', 2)] },
-    bel_revise:{ name: '고쳐 쓰기', element: 'tide', base: 8, lamps: 2, bonus: 5 },
+    bel_revise:{ name: '고쳐 쓰기', element: 'tide', base: 7, lamps: 2, bonus: 5 },
 
     // 5장
     hn_decree: { name: '지워진 칙령', element: 'lumen', base: 5, lamps: 3, bonus: 3, desc: '적중 시 심지 -2.', effects: [hitRes(-2)] },
@@ -110,7 +110,7 @@
       effects: [{ when: 'use', do: 'resolve', n: -3, target: 'enemies' }] },
     lg_write:  { name: '기록', element: 'lumen', base: 7, lamps: 3, bonus: 4 },
     lg_record: { name: '열람', element: 'lumen', base: 6, lamps: 3, bonus: 3, desc: '적중 시 침식 1.', effects: [hit('erosion', 1)] },
-    lq_strike: { name: '펜촉', element: 'thunder', base: 8, lamps: 2, bonus: 5 },
+    lq_strike: { name: '펜촉', element: 'thunder', base: 7, lamps: 2, bonus: 4 },
     li_flood:  { name: '잉크 쏟기', element: 'tide', base: 4, lamps: 4, bonus: 3, desc: '적중 시 침식 1.', effects: [hit('erosion', 1)] }
   };
 

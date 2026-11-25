@@ -91,7 +91,7 @@
   // ---------------------------------------------------------------- 비전투 인물 (스탠딩/대사용)
   D.npcs = {
     hester:   { name: '헤스터', fullName: '헤스터 크레인', color: '#6d6a5e', expressions: ['normal', 'smile', 'sad'] },
-    belgrave: { name: '벨그레이브', fullName: '오스왈드 벨그레이브', color: '#8a7a5a', expressions: ['normal', 'smile', 'cold'] },
+    belgrave: { name: '벨그레이브', fullName: '오스왈드 벨그레이브', color: '#8a7a5a', expressions: ['normal', 'smile', 'cold', 'sad'] },
     julian:   { name: '율리안', fullName: '율리안 하이든', color: '#7b2d3a', expressions: ['normal', 'angry', 'sad'] },
     magda:    { name: '마그다', fullName: '마그다 오르테가', color: '#7a5a3a', expressions: ['normal', 'angry', 'smile'] },
     bruno:    { name: '브루노', fullName: '브루노 카스텔', color: '#5a7a3a', expressions: ['normal', 'angry', 'scared'] },
@@ -107,7 +107,7 @@
   /** 대사 화자 이름 → 캐릭터 ID (스탠딩 강조용). 목록에 없으면 이름만 표시. */
   D.speakers = {
     '레녹스': 'lennox', '카이엔': 'kaien', '비비안': 'vivienne', '롤랑': 'roland', '미레유': 'mireille',
-    '세라핀': 'seraphine', '헤스터': 'hester', '학장': 'belgrave', '벨그레이브': 'belgrave',
+    '세라핀': 'seraphine', '세라': 'seraphine', '헤스터': 'hester', '학장': 'belgrave', '벨그레이브': 'belgrave',
     '율리안': 'julian', '마그다': 'magda', '마그다 교관': 'magda', '브루노': 'bruno', '핀': 'finn',
     '잿빛 왕': 'ashen', '아르딘': 'ashen', '이준': 'ashen', '레녹스?': 'real_lennox', '진짜 레녹스': 'real_lennox',
     '마르타': 'martha', '엘레노어': 'eleanor'
