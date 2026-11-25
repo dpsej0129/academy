@@ -30,7 +30,9 @@
 
   function skillDef(id) {
     var d = D();
-    return d.skills[id] || d.enemySkills[id] || null;
+    var s = d.skills[id] || d.enemySkills[id] || null;
+    if (s && !s.id) s.id = id;
+    return s;
   }
 
   // ---------------------------------------------------------------- 생성
@@ -86,7 +88,9 @@
       brokenUntil: -1, panic: false, dead: false,
       deck: c.deck.slice(), ratio: c.ratio.slice(), pile: [], hand: [],
       guard: c.guard, ult: c.ult, sealed: {}, usage: {}, mods: mods, dice: [],
-      engraving: p.engraving || null
+      engraving: p.engraving || null,
+      // 레벨(장 진행)과 단련이 격돌 위력에도 반영된다
+      powerUp: Math.floor(level / 2) + (up >= 3 ? 1 : 0)
     };
     this.units.push(u);
     return u;
@@ -97,7 +101,7 @@
     if (typeof entry === 'string') entry = { id: entry };
     var e = d.enemies[entry.id];
     if (!e) throw new Error('알 수 없는 적: ' + entry.id);
-    var hpMult = (entry.hpMult || 1) * this.diff.hp;
+    var hpMult = (entry.hpMult || 1) * this.diff.hp * (this.def.scale || 1);
     var extraDice = 0;
     mods.forEach(function (m) {
       if (m.enemy === entry.id) { hpMult *= (m.hpMult || 1); extraDice += (m.dice || 0); }

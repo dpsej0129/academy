@@ -6,6 +6,7 @@
  *  winCondition: { type: 'survive', turns } 생존형 승리 조건
  *  events: [{ turn, speaker, text }] 전투 중 대사
  *  reward: 성흔 파편(단련 재료)
+ *  scale: 적 체력 배율(장 후반 정예·보스 조정용)
  */
 (function (root) {
   'use strict';
@@ -57,6 +58,7 @@
       ]
     },
     c1_b4: {
+      scale: 1.0,
       name: '중간 평가 — 감독관 인형', tier: 'boss', bg: 'arena', level: 2,
       enemies: ['warden_arm_l', 'warden', 'warden_arm_r'], maxParty: 4, forced: ['lennox'], reward: 6,
       mods: [{ if: 'flag.mocked', enemy: 'warden', hpMult: 1.15 }],
@@ -74,6 +76,7 @@
       events: [{ turn: 1, speaker: '롤랑', text: '후후, 배당은 그레이번 공에게 1대 9. 제 전 재산을 걸었지요.' }]
     },
     c2_b2: {
+      scale: 1.1,
       name: '결투제 본선 — 쌍검 쌍둥이', tier: 'elite', bg: 'arena', level: 3,
       enemies: ['twin_odel', 'twin_odil'], maxParty: 3, forced: ['lennox'], reward: 5,
       intro: '한 명을 쓰러뜨리면 남은 쪽이 격앙한다. 둘의 체력을 고르게 깎는 것도 방법이다.',
@@ -88,6 +91,7 @@
       ]
     },
     c2_b4: {
+      scale: 1.05,
       name: '결투제 결승 — 학생회장 율리안', tier: 'boss', bg: 'arena_final', level: 3,
       enemies: ['julian'], maxParty: 3, forced: ['lennox'], reward: 8,
       intro: '율리안은 빠르고, 느린 공격을 가로챈다. 체력 50% 이하에서 검집을 벗는다.',
@@ -101,11 +105,13 @@
       events: [{ turn: 1, speaker: '비비안', text: '하얗네요. 피도, 비명도.' }]
     },
     c3_b2: {
+      scale: 1.3,
       name: '흰 등대의 파수견', tier: 'elite', bg: 'lighthouse', level: 4,
       enemies: ['margin_crawler', 'margin_hound'], maxParty: 4, forced: ['lennox'], reward: 6,
       events: [{ turn: 2, speaker: '카이엔', text: '저 개, 등대 쪽을 지키는 거야, 아니면 막는 거야?' }]
     },
     c3_b3a: {
+      scale: 1.25,
       name: '제국의 그림자', tier: 'elite', bg: 'fortress_night', level: 4,
       enemies: ['imperial_agent', 'imperial_captain', 'imperial_agent'], maxParty: 4, forced: ['lennox', 'roland'], reward: 6,
       events: [
@@ -114,6 +120,7 @@
       ]
     },
     c3_b3b: {
+      scale: 1.25,
       name: '배신의 밤 — 롤랑', tier: 'elite', bg: 'fortress_night', level: 4,
       enemies: ['imperial_agent', 'roland_foe', 'imperial_agent'], maxParty: 4, forced: ['lennox'], reward: 6,
       events: [{ turn: 1, speaker: '롤랑', text: '미안합니다, 친애하는 그레이번 공. 판돈이 너무 컸어요.' }]
@@ -123,6 +130,7 @@
       enemies: ['page_wraith', 'bookworm', 'page_wraith'], maxParty: 4, forced: ['lennox'], reward: 5
     },
     c3_b5: {
+      scale: 1.15,
       name: '이름 없는 성가대', tier: 'boss', bg: 'archive_choir', level: 4,
       enemies: ['choir_soprano', 'choir_alto', 'choir_conductor', 'choir_bass'], maxParty: 4, forced: ['lennox'], reward: 9,
       intro: '세 성가대원이 모두 살아있으면 매 턴 끝에 합창(심지 -6, 침식). 하나라도 먼저 쓰러뜨려라.',
@@ -137,6 +145,7 @@
       events: [{ turn: 1, speaker: '개찬된 학생', text: '【오류를 수정합니다. 오류를 수정합니다.】' }]
     },
     c4_b2: {
+      scale: 1.35,
       name: '감독관 개량형', tier: 'elite', bg: 'courtyard_snow', level: 5,
       enemies: ['warden_mk2'], maxParty: 4, forced: ['lennox'], reward: 7,
       events: [{ turn: 1, speaker: '감독관 개량형', text: '【오류 레녹스 그레이번. 이번에는 확실히.】' }]
@@ -147,6 +156,7 @@
       events: [{ turn: 1, speaker: '비비안', text: '천장이… 하얗게 지워지고 있어요.' }]
     },
     c4_b4a: {
+      scale: 1.2,
       name: '갈까마귀관 사수', tier: 'elite', bg: 'dorm_night', level: 5,
       enemies: ['margin_crawler', 'margin_hound', 'margin_crawler'], maxParty: 4, forced: ['lennox', 'kaien'], reward: 7,
       winCondition: { type: 'survive', turns: 5, text: '새벽 종이 울렸다. 누락체들이 물러난다!' },
@@ -154,11 +164,13 @@
       events: [{ turn: 1, speaker: '카이엔', text: '왔냐, 그레이번! 늦었잖아, 임마!' }]
     },
     c4_b4b: {
+      scale: 1.35,
       name: '시계탑 계단 — 장부의 집행관', tier: 'elite', bg: 'clocktower_stairs', level: 5,
       enemies: ['page_wraith', 'ledger_executor'], maxParty: 4, forced: ['lennox'], reward: 7,
       events: [{ turn: 1, speaker: '장부의 집행관', text: '【성객 회수 중. 열람자는 물러나십시오.】' }]
     },
     c4_b5: {
+      scale: 1.2,
       name: '관리인 오스왈드 벨그레이브', tier: 'boss', bg: 'clocktower_top', level: 5,
       enemies: ['belgrave'], maxParty: 4, forced: ['lennox'], reward: 10,
       mods: [{ if: 'flag.julian_ally', enemy: 'belgrave', hpMult: 0.85 }],
@@ -175,16 +187,19 @@
       enemies: ['margin_crawler', 'hollow_noble', 'margin_crawler'], maxParty: 4, forced: ['lennox'], reward: 6
     },
     c5_b2: {
+      scale: 1.35,
       name: '검은 잉크의 기사', tier: 'elite', bg: 'ink_corridor', level: 6,
       enemies: ['ink_knight'], maxParty: 4, forced: ['lennox'], reward: 8,
       events: [{ turn: 1, speaker: '검은 기사', text: '…세이브… 포인트… 여기… 없어…' }]
     },
     c5_b3: {
+      scale: 1.3,
       name: '각본의 성객', tier: 'boss', bg: 'ink_corridor', level: 6,
       enemies: ['scripted_seraphine'], maxParty: 4, forced: ['lennox'], reward: 8,
       events: [{ turn: 1, speaker: '세라핀', text: '【메인 퀘스트: 레녹스 그레이번을 처치하라. 보상: 귀환.】' }]
     },
     c5_b4: {
+      scale: 1.2,
       name: '잿빛 왕', tier: 'boss', bg: 'ashen_throne', level: 6,
       enemies: ['ashen_king'], maxParty: 4, forced: ['lennox'], reward: 10,
       mods: [{ if: 'flag.named_king', enemy: 'ashen_king', hpMult: 0.8 }],
@@ -195,6 +210,7 @@
       ]
     },
     c5_b5: {
+      scale: 1.2,
       name: '별의 장부', tier: 'boss', bg: 'ledger_heart', level: 6,
       enemies: ['ledger_quill', 'ledger', 'ledger_ink'], maxParty: 4, forced: ['lennox'], reward: 0,
       mods: [

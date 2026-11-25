@@ -59,8 +59,16 @@
   // ---------- 에셋: 파일이 없으면 색 블록 + 이름 텍스트 ----------
   var cache = {}; // path -> 'ok' | 'fail' | Promise
   G.Assets = {
+    /** 매니페스트(data/assets.js)에 등록된 파일만 불러온다. 없는 파일을 요청하면 브라우저 콘솔에 404 에러가 찍히기 때문. */
+    listed: function (path) {
+      var m = root.GameData && root.GameData.assets;
+      if (!m) return false;
+      if (m.probeAll) return true;
+      if (!m._set) { m._set = {}; (m.files || []).forEach(function (f) { m._set[f] = 1; }); }
+      return !!m._set[path];
+    },
     probe: function (path, cb) {
-      if (!path || typeof Image === 'undefined') { cb(false); return; }
+      if (!path || typeof Image === 'undefined' || !G.Assets.listed(path)) { cb(false); return; }
       if (cache[path] === 'ok') { cb(true); return; }
       if (cache[path] === 'fail') { cb(false); return; }
       if (cache[path] && cache[path].push) { cache[path].push(cb); return; }
