@@ -270,7 +270,14 @@
       case 'unlock': {
         var tier = +parts[1] || 1;
         var ids = parts[0] === 'all' ? Object.keys(s.chars) : [parts[0]];
-        ids.forEach(function (id) { if (s.chars[id]) s.chars[id].unlocked = Math.max(s.chars[id].unlocked, tier); });
+        ids.forEach(function (id) {
+          var c = s.chars[id];
+          if (!c) return;
+          c.unlocked = Math.max(c.unlocked, tier);
+          // 비어 있는 각인 칸은 새로 해금된 각인으로 자동 장착 (편성 화면에서 언제든 변경 가능)
+          var ch = D.characters[id];
+          if (!c.engraving && ch && ch.engravings[tier - 1]) c.engraving = ch.engravings[tier - 1];
+        });
         this.emit('toast', '각인 해금 — ' + (parts[0] === 'all' ? '전원' : (D.characters[parts[0]] || {}).name) + ' ' + tier + '단계');
         break;
       }
