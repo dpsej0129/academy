@@ -7,7 +7,7 @@
  *   그냥 문장                   나레이션
  *   // 주석
  *   if(조건) <아무 줄>           조건이 참일 때만 실행/표시
- *   ? 선택지 => 라벨 | 효과; 효과 | if 조건     (연속된 ? 줄이 하나의 선택지 묶음, => 생략 시 다음 줄로)
+ *   ? 선택지 => 라벨 | 효과; 효과 | if 조건     ('? ' 물음표+공백으로 시작. 연속된 줄이 하나의 선택지 묶음, => 생략 시 다음 줄로)
  *
  *   @bg 배경ID                  @show 캐릭터[:표정] [L|C|R]       @hide 캐릭터|all
  *   @cg CG_ID | off             @scene 장소·시간 캡션             @sys 【상태창 문구】
@@ -75,7 +75,7 @@
       var cond = null;
       var cm = line.match(/^if\(([^)]*(?:\([^)]*\)[^)]*)*)\)\s*(.*)$/);
       if (cm) { cond = cm[1]; line = cm[2]; }
-      if (line.charAt(0) === '?') {
+      if (/^\?\s/.test(line)) { // '? 선택지' — '???: 대사'와 구분하기 위해 물음표 뒤 공백 필수
         var opt = parseChoice(line, where);
         if (cond) opt.cond = opt.cond ? '(' + opt.cond + ') && (' + cond + ')' : cond;
         if (!choice) choice = { t: 'choice', options: [], id: where, where: where };

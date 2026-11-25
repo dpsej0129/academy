@@ -12,7 +12,7 @@ try { script = new Game.Script(D); } catch (e) { console.error('파싱 실패:',
 const ops = script.ops;
 
 // ---------------------------------------------------------------- 정적 검사
-const KNOWN_SPEAKERS = new Set(Object.keys(D.speakers).concat(['도윤', '???', '감독관 인형', '교복 입은 그림자', '교복 입은 누락체', '오델', '오딜', '제국 첩보대장', '제국 요원', '성가대', '장부의 집행관', '개찬된 학생', '감독관 개량형', '검은 기사', '장부', '학생', '사서', '심판', '후배', '공작', '로셰 공작', '1학년', '관중', '목소리', '아이']));
+const KNOWN_SPEAKERS = new Set(Object.keys(D.speakers).concat(['도윤', '???', '감독관 인형', '교복 입은 그림자', '교복 입은 누락체', '오델', '오딜', '제국 첩보대장', '제국 요원', '성가대', '장부의 집행관', '개찬된 학생', '감독관 개량형', '검은 기사', '장부', '학생', '사서', '심판', '후배', '공작', '로셰 공작', '1학년', '관중', '목소리', '아이', '교수']));
 const unknownSpeakers = {};
 const chapterOf = (where) => where.split(':')[0];
 const stats = {};

@@ -49,7 +49,30 @@ if(!flag.ser_captured) 세라핀: 수업 같아요. …저, 이런 교실 알아
 if(!flag.ser_captured) 세라핀: 고등학교요. 한국의. 이제 기억나요. 조금씩.
 if(flag.ser_captured) 세라핀이 있어야 할 창가 자리가 비어 있었다. 책상 위에 종이배 하나가 놓여 있었다. '집에 가고 싶어.'
 if(flag.ser_captured) @hide seraphine
+창밖의 하얀 호수에서 목소리가 메아리쳤다. 이 교실에 고인 기억들이었다.
+교수: 세계는 쓰인 글이다…
+마그다: 굼벵이들아! 숫자가 칼을 대신 휘둘러 주지 않는다!
+학장: 허허, 내일부터는 아카데미가 너희의 집이란다…
+48번의 봄 동안 이 교실에서 반복된 말들. 같은 학생에게, 같은 날에, 같은 목소리로.
+if(flag.hester_named) @show hester:smile R
+if(flag.hester_named) 헤스터: 왔구려.
+if(flag.hester_named) 교실 맨 뒷자리에 회색 숄의 그림자가 앉아 있었다. 투명하게 비치는, 그러나 분명한.
+if(flag.hester_named) 헤스터: 그대가 내 이름을 적어서, 이만큼은 남았소. 고맙소.
+if(flag.hester_named) 헤스터: 몇이오? 이름.
+if(flag.hester_named && names>=4) 헤스터: …그렇구려. 그 젊은이보다 멀리 왔소. 마지막 하나는, 왕좌에 앉은 자의 것이겠지.
+if(flag.hester_named && names<4) 헤스터: …모자라오. 하지만 아직 끝나지 않았소. 이름은 기억하는 자가 부를 때마다 돌아오는 법이니.
+if(flag.hester_named) @hide hester
 @show vivienne:normal L
+비비안: …레녹스. 아니, 그쪽 진짜 이름이 따로 있다고 했죠.
+레녹스: 한도윤.
+비비안: 도윤. …발음이 어렵네요. 익숙해질 때까지 몇 번 더 불러 볼게요.
+if(member.seraphine) 세라핀: 도윤 씨는 원래 뭐 하던 사람이에요? 저쪽에서.
+if(member.seraphine) 레녹스: 게임 버그 찾는 일.
+if(member.seraphine) 세라핀: 와. 그럼 지금도 하던 일 하는 거네요. 이 세계 버그 찾기.
+if(member.seraphine) 레녹스: …그러네.
+if(alive.kaien) 카이엔: 도윤이든 그레이번이든 상관없어. 내 룸메이트는 고기 파이를 사 줄 놈이다. 그거면 됐다.
+if(member.roland) 롤랑: 후후. 저는 처음부터 알았지요. 확률이 이상하게 구는 사람은 대개 다른 데서 온 사람이거든요.
+if(alive.mireille) 미레유: …오라버니가 고른 사람이에요. 이상한 사람이어도, 좋은 사람이에요.
 비비안: 끝나면… 뭘 할 거예요? 다들.
 비비안: 저는 아버지와 싸울 거예요. 기록원 회의와. 축복이 없어도 로셰가는 로셰가라는 걸 보여 줄 거예요.
 if(member.roland) @show roland:smile R

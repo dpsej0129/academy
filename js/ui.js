@@ -385,7 +385,9 @@
     },
     toast: function (msg) {
       var t = el('div', 'toast', U.esc(msg));
-      $('#toast-box').appendChild(t);
+      var box = $('#toast-box');
+      while (box.children.length >= 3) box.removeChild(box.firstChild);
+      box.appendChild(t);
       setTimeout(function () { t.remove(); }, 3300);
     },
     cutin: function (id, caption, cb) {
@@ -422,7 +424,8 @@
       ov.classList.remove('hidden');
       this._overlayClose = opts.noClose ? null : function () { self.closeOverlay(); if (opts.onClose) opts.onClose(); };
       this._overlayKey = opts.onKey || null;
-      ov.onclick = function (e) { if (e.target === ov && self._overlayClose) self._overlayClose(); };
+      var armedAt = Date.now() + 250;
+      ov.onclick = function (e) { if (e.target === ov && self._overlayClose && Date.now() > armedAt) self._overlayClose(); };
       return b;
     },
     closeOverlay: function () {
@@ -669,8 +672,10 @@
       var card = el('div', 'chapter-card', '<div class="k">' + keyLabel + '</div><h2>' + U.esc(r.title) + '</h2><div class="sub">' + U.esc(r.sub) + '</div><div class="go">클릭하여 계속</div>');
       ov.appendChild(card);
       ov.classList.remove('hidden');
-      var done = false;
-      var go = function () { if (done) return; done = true; self.closeOverlay(); cb(); };
+      var done = false, armed = false;
+      // 이 표지를 띄운 클릭이 오버레이까지 버블링되어 곧바로 닫히지 않도록 잠시 뒤에 입력을 받는다
+      setTimeout(function () { armed = true; }, 250);
+      var go = function () { if (done || !armed) return; done = true; self.closeOverlay(); cb(); };
       ov.onclick = go;
       this._overlayKey = go;
       this._overlayClose = go;
@@ -682,7 +687,9 @@
       this.closeOverlay();
       var box = el('div', 'tip-box', '<h3>도움말</h3><p>' + U.esc(text) + '</p>');
       var b = el('button', 'btn primary', '확인');
-      var go = function () { self.closeOverlay(); cb(); };
+      var done = false, armed = false;
+      setTimeout(function () { armed = true; }, 250);
+      var go = function () { if (done || !armed) return; done = true; self.closeOverlay(); cb(); };
       b.onclick = go;
       box.appendChild(b);
       ov.appendChild(box);

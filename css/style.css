@@ -118,7 +118,7 @@ button { font-family: inherit; color: inherit; }
 #dialog .read-mark { position: absolute; right: 18px; top: 8px; font-size: 11px; color: var(--dim); }
 
 #quick-menu {
-  position: absolute; z-index: 7; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px;
+  position: absolute; z-index: 9; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px;
   width: min(980px, 96vw); justify-content: flex-end; flex-wrap: wrap;
 }
 #quick-menu button {
@@ -390,4 +390,7 @@ button { font-family: inherit; color: inherit; }
   .b-foot .harm { flex-basis: 100%; font-size: 11px; }
   .b-foot .btn { flex: 1; padding: 9px 6px; font-size: 14px; }
   .clash-panel { padding: 6px 8px; }
+}
+@media (max-width: 720px) {
+  .toast { font-size: 12px; padding: 6px 10px; opacity: .95; }
 }
