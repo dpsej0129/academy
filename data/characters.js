@@ -2,7 +2,7 @@
  * 밸런스 수치는 여기서만 고치면 된다. (코드 수정 불필요)
  *
  * 스킬 필드
- *   base: 기본 위력 / lamps: 등불(코인) 수 / bonus: 점화(앞면) 시 위력 증감
+ *   base: 기본 위력 / lamps: 등불 수 / bonus: 등불이 켜졌을(점화) 때 위력 증감
  *   effects: [{ when:'use'|'hit'|'heads'|'win', do:'status'|'heal'|'resolve'|'glow', target, status, n, pct }]
  *     target: self | target | allies | enemies | lowestAlly | randomEnemy
  *   powerIf: { status, min, n } 대상이 상태이상을 min 이상 가지면 위력 +n
@@ -97,11 +97,9 @@
     bruno:    { name: '브루노', fullName: '브루노 카스텔', color: '#5a7a3a', expressions: ['normal', 'angry', 'scared'] },
     finn:     { name: '핀', fullName: '핀 애셔', color: '#7a8a6a', expressions: ['normal', 'smile', 'scared'] },
     ashen:    { name: '잿빛 왕', fullName: '잿빛 왕 (아르딘)', color: '#4a4a52', expressions: ['normal', 'smile', 'sad'] },
-    real_lennox: { name: '레녹스?', fullName: '진짜 레녹스', color: '#3a3f55', expressions: ['normal', 'sad'] },
-    doyun:    { name: '도윤', fullName: '한도윤', color: '#44506a', expressions: ['normal'] },
-    ledger:   { name: '장부', fullName: '별의 장부', color: '#c8b46a', expressions: ['normal'] },
-    martha:   { name: '마르타', fullName: '마르타 브라트', color: '#a0553a', expressions: ['normal', 'smile'] },
-    eleanor:  { name: '엘레노어', fullName: '엘레노어 로셰', color: '#5a7fb0', expressions: ['normal', 'smile'] }
+    real_lennox: { name: '레녹스?', fullName: '진짜 레녹스', color: '#3a3f55', expressions: ['normal', 'sad', 'smile'] },
+    martha:   { name: '마르타', fullName: '마르타 브라트', color: '#a0553a', expressions: ['normal', 'smile', 'sad'] },
+    eleanor:  { name: '엘레노어', fullName: '엘레노어 로셰', color: '#5a7fb0', expressions: ['normal', 'smile', 'sad'] }
   };
 
   /** 대사 화자 이름 → 캐릭터 ID (스탠딩 강조용). 목록에 없으면 이름만 표시. */

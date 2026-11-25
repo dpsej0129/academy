@@ -6,6 +6,8 @@
 
   function elemTag(e) {
     var info = D().elements[e] || { name: e, color: '#888' };
+    // 아이콘 이미지가 매니페스트에 있으면 이미지, 없으면 색 점
+    if (info.icon && G.Assets.listed(info.icon)) return '<img class="elem-ico" src="' + info.icon + '" alt="">' + info.name;
     return '<span class="elem-dot" style="background:' + info.color + '"></span>' + info.name;
   }
   function skillLine(sk) {
@@ -286,7 +288,8 @@
       Object.keys(v.st || {}).forEach(function (k) {
         if (!v.st[k]) return;
         var info = d.statuses[k] || { name: k };
-        var s = el('span', 'st', U.esc(info.name) + ' ' + v.st[k]);
+        var ico = info.icon && G.Assets.listed(info.icon) ? '<img src="' + info.icon + '" alt="">' : '';
+        var s = el('span', 'st', ico + U.esc(info.name) + ' ' + v.st[k]);
         s.title = info.desc || '';
         s.style.borderLeft = '3px solid ' + (info.color || '#888');
         sts.appendChild(s);
@@ -295,8 +298,9 @@
         Object.keys(u.sealed).forEach(function (sid) { sts.appendChild(el('span', 'st', '봉인: ' + U.esc((e.skill(sid) || {}).name))); });
       }
       card.appendChild(sts);
-      if (v.broken && !v.dead) card.appendChild(el('div', 'flag broken', '자세 붕괴'));
-      else if (v.panic && !v.dead) card.appendChild(el('div', 'flag panic', '공황'));
+      var fico = function (k) { var i = d.statuses[k].icon; return G.Assets.listed(i) ? '<img src="' + i + '" alt="" style="width:11px;height:11px;vertical-align:middle;margin-right:2px">' : ''; };
+      if (v.broken && !v.dead) card.appendChild(el('div', 'flag broken', fico('broken') + '자세 붕괴'));
+      else if (v.panic && !v.dead) card.appendChild(el('div', 'flag panic', fico('panic') + '공황'));
 
       if (u.side === 'enemy') {
         var dice = el('div', 'dice');
@@ -491,7 +495,7 @@
             break;
           case 'clashEnd':
             if (clash) { clash.winner = ev.winner; self.drawClash(clash, name); }
-            wait = 420; self.note('→ ' + name(ev.winner) + ' 승리 (' + ev.rounds + '합)');
+            wait = 420; self.note('→ ' + name(ev.winner) + ' 승리 (격돌 ' + ev.rounds + '회)');
             break;
           case 'attackStart':
             self.hl([ev.uid, ev.target]);

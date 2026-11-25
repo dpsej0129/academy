@@ -188,7 +188,7 @@
       resist: { ember: 1.4, lumen: 1.2, tide: 0.8 }, desc: '찢긴 책장이 사람 모양으로 접혔다.' },
     bookworm: { name: '서가의 좀', tier: 'mob', color: '#8a7a5a', hp: 120, speed: [1, 4], skills: ['bw_chew'],
       resist: { ember: 1.4 }, desc: '금서의 활자를 먹고 자랐다.' },
-    choir_conductor: { name: '성가대 · 지휘자', tier: 'boss', color: '#2a2a2a', hp: 470, speed: [3, 6], dice: 1,
+    choir_conductor: { name: '성가대 · 지휘자', tier: 'boss', color: '#2a2a2a', hp: 420, speed: [3, 6], dice: 1,
       parts: ['choir_soprano', 'choir_alto', 'choir_bass'], shieldWhileParts: 0.4, breaks: [0.6, 0.3],
       skills: ['cc_baton', 'cc_requiem'], gimmick: { type: 'chorus', resolve: 6, erosion: 1,
         text: '세 목소리가 겹친다. 지워진 이름들의 합창이 심지를 갉아먹는다.' },
