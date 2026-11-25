@@ -18,7 +18,7 @@ function scriptOrder() {
 
 function load(opts) {
   opts = opts || {};
-  const files = (opts.files || scriptOrder()).filter((f) => opts.includeUi || !/js\/(ui|main|save)\.js$/.test(f));
+  const files = (opts.files || scriptOrder()).filter((f) => opts.includeUi || !/js\/(ui|battle_ui|main|save)\.js$/.test(f));
   for (const f of files) {
     const code = fs.readFileSync(path.join(ROOT, f), 'utf8');
     vm.runInThisContext(code, { filename: f });

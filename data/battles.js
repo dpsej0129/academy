@@ -113,10 +113,10 @@
     c3_b3a: {
       scale: 1.25,
       name: '제국의 그림자', tier: 'elite', bg: 'fortress_night', level: 4,
-      enemies: ['imperial_agent', 'imperial_captain', 'imperial_agent'], maxParty: 4, forced: ['lennox', 'roland'], reward: 6,
+      enemies: ['imperial_agent', 'imperial_captain', 'imperial_agent'], maxParty: 4, forced: ['lennox'], reward: 6,
       events: [
-        { turn: 1, speaker: '제국 첩보대장', text: '베르니에. 네 어머니의 목숨값을 잊었나.' },
-        { turn: 1, speaker: '롤랑', text: '후후. 판을 바꿨습니다. 이번엔 제 돈으로요.' }
+        { turn: 1, speaker: '제국 첩보대장', text: '베르니에의 셋째는 어디 갔지? 겁먹고 도망쳤나, 아니면 마음을 바꿨나.' },
+        { turn: 2, speaker: '제국 첩보대장', text: '장부의 페이지를 내놓아라. 제국은 그것으로 새 별을 띄울 것이다.' }
       ]
     },
     c3_b3b: {
