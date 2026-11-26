@@ -4,6 +4,9 @@
 > 이미지를 넣은 뒤에는 `node tools/scan_assets.js`를 실행해 이미지 매니페스트(`data/assets.js`)를 갱신한다. (Node가 없다면 `data/assets.js`의 `files` 배열에 경로를 직접 추가하거나 `probeAll: true`로 바꾼다.)
 > 파일이 없으면 게임은 색 블록 + 이름 텍스트로 대신 표시한다.
 
+**프롬프트 실행 횟수: 필수 135회** (선택 6회 별도).
+인물 스탠딩은 **표정 시트** 방식이라, 인물 한 명당 프롬프트 1번으로 표정 3~6종을 한 장에 받는다. 표정을 하나씩 뽑으면 62번이 필요하지만 시트로는 16번이면 된다. 게임이 시트를 칸 단위로 잘라 쓴다.
+
 ## 공통 스타일 (모든 프롬프트 맨 앞에 포함됨)
 
 ```
@@ -16,26 +19,58 @@ anime gacha game art, western dark fantasy academy, cel shading with soft painte
 lowres, blurry, jpeg artifacts, watermark, signature, text, letters, logo, extra fingers, deformed hands, bad anatomy, 3d render, photorealistic, chibi, oversaturated neon colors, cropped head, duplicate character, modern city
 ```
 
+## 표정 시트 사용법
+
+1. 아래 「1. 캐릭터 표정 시트」의 프롬프트를 **한 번** 실행한다. 칸은 표의 순서(왼쪽→오른쪽, 위→아래)대로 표정이 들어가야 한다.
+2. 결과가 칸 순서와 다르면 이미지 편집기에서 칸을 옮기거나, 원하는 표정이 나올 때까지 다시 뽑는다.
+3. 가능하면 **배경을 제거해 투명 PNG**로 저장한다. 단색 배경 그대로 써도 동작하지만 인물 뒤에 회색 상자가 보인다.
+4. `assets/char/<인물ID>_sheet.png`로 저장하고 `node tools/scan_assets.js`를 실행한다.
+
+- 게임은 이미지 크기를 칸 수(열·행)로 똑같이 나눠 한 칸씩 잘라 쓴다. 비율이 조금 달라도 잘리긴 하지만, **권장 비율을 맞출수록 인물이 칸 중앙에 정확히 들어온다.**
+- 칸 배치 규칙: 표정 1~3개 → 한 줄, 4개 → 2×2, 5~6개 → 3×2(5개면 마지막 칸은 비움).
+- 우선순위: `assets/char/<인물ID>_<표정>.png` 개별 파일이 있으면 그것을, 없으면 시트를 쓴다. 특정 표정만 따로 고치고 싶을 때는 개별 파일로 덮어쓰면 된다.
+- 전투·편성 초상화(`assets/portrait/<ID>.png`)는 **선택**이다. 없으면 시트의 「기본」 칸에서 머리~어깨를 잘라 쓴다.
+
+| ID | 인물 | 표정 수 | 배치(열×행) | 권장 해상도 | 칸 순서 |
+|---|---|---|---|---|---|
+| `lennox` | 레녹스 그레이번 | 5 | 3×2 | 2160×2560 | 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`)<br>2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸) |
+| `kaien` | 카이엔 브라트 | 5 | 3×2 | 2160×2560 | 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`)<br>2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸) |
+| `vivienne` | 비비안 로셰 | 5 | 3×2 | 2160×2560 | 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`)<br>2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸) |
+| `roland` | 롤랑 드 베르니에 | 5 | 3×2 | 2160×2560 | 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`)<br>2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸) |
+| `mireille` | 미레유 그레이번 | 5 | 3×2 | 2160×2560 | 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`)<br>2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸) |
+| `seraphine` | 세라핀 루엘 | 6 | 3×2 | 2160×2560 | 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`)<br>2행: 슬픔(`sad`) · 놀람(`surprised`) · 무표정(퀘스트 상태)(`blank`) |
+| `hester` | 헤스터 크레인 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`) |
+| `belgrave` | 오스왈드 벨그레이브 | 4 | 2×2 | 1440×2560 | 1행: 기본(`normal`) · 미소(`smile`)<br>2행: 냉정(`cold`) · 슬픔(`sad`) |
+| `julian` | 율리안 하이든 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 분노(`angry`) · 슬픔(`sad`) |
+| `magda` | 마그다 오르테가 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 분노(`angry`) · 미소(`smile`) |
+| `bruno` | 브루노 카스텔 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 분노(`angry`) · 겁먹음(`scared`) |
+| `finn` | 핀 애셔 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 미소(`smile`) · 겁먹음(`scared`) |
+| `ashen` | 잿빛 왕 (아르딘) | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`) |
+| `real_lennox` | 진짜 레녹스 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 슬픔(`sad`) · 미소(`smile`) |
+| `martha` | 마르타 브라트 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`) |
+| `eleanor` | 엘레노어 로셰 | 3 | 3×1 | 2160×1280 | 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`) |
+
 ## 제작 가이드
 
 - **일관성**: 같은 인물은 아래 '인물 묘사'를 토씨 하나 바꾸지 말고 재사용한다. 가능하면 같은 시드 / 캐릭터 레퍼런스(IP-Adapter, 캐릭터 LoRA 등)를 쓴다.
-- **스탠딩**은 투명 배경 PNG, 발끝까지 보이게. 게임은 화면 높이의 약 82%(모바일 62%)로 아래 정렬해 표시한다.
+- **스탠딩**은 발끝까지 보이게. 게임은 칸 하나를 화면 높이의 약 82%(모바일 62%)로 아래 정렬해 표시한다.
 - **아이콘**은 16~24px로 축소되어 보이므로 실루엣이 분명해야 한다.
 - 한글·영문 글자가 그림에 들어가지 않도록 한다(로고는 프레임만 만들고 글자는 편집 프로그램에서 넣는다). 단, 시계탑 낙서 CG는 글자 위치만 잡고 한글은 후보정으로 넣는 것을 권장한다.
 
-| 구분 | 권장 해상도 | 비율 | 개수 |
+| 구분 | 권장 해상도 | 비율 | 실행 횟수 |
 |---|---|---|---|
-| 1. 캐릭터 스탠딩 | 1080×1920 | 9:16 | 62 |
-| 2. 전투 초상화 | 512×512 | 1:1 | 6 |
+| 1. 캐릭터 표정 시트 | 인물별 (위 표) | 인물별 | 16 |
+| 2. 전투 초상화 (선택) | 512×512 | 1:1 | 6 |
 | 3. 극의 컷인 | 1920×640 | 3:1 | 6 |
-| 4. 적 · 보스 | 768×768 | 1:1 | 41 |
+| 4. 적 · 보스 | 768×768 / 1024×1024 | 1:1 | 41 |
 | 5. 배경 | 1920×1080 | 16:9 | 41 |
 | 6. 이벤트 CG | 1920×1080 | 16:9 | 8 |
 | 7. 엔딩 CG | 1920×1080 | 16:9 | 3 |
-| 8. 타이틀 | 1920×1080 | 16:9 | 2 |
+| 8. 타이틀 | 1920×1080 / 1600×600 | 16:9 / 8:3 | 2 |
 | 9. UI 아이콘 — 속성 | 128×128 | 1:1 | 7 |
 | 10. UI 아이콘 — 상태이상 | 128×128 | 1:1 | 11 |
-| **합계** | | | **187** |
+| **필수 합계** | | | **135** |
+| (선택 포함 시) | | | 141 |
 
 ## 인물 묘사 (고정 문구)
 
@@ -59,570 +94,174 @@ lowres, blurry, jpeg artifacts, watermark, signature, text, letters, logo, extra
 | `eleanor` | elegant woman in her late thirties named Eleanor, long silver-blue hair like her daughter Vivienne, pale blue gown, frost-flower brooch, soft gentle eyes |
 
 
-## 1. 캐릭터 스탠딩
+## 1. 캐릭터 표정 시트
 
-### `assets/char/lennox_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 레녹스 그레이번 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/lennox_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 레녹스 그레이번 — 표정 5종 (3열×2행)
+- **권장 해상도 / 비율**: 2160×2560 / 27:32
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`) / 2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old boy named Lennox, ash-silver messy hair, grey eyes, sharp jawline, faint dark circles, black and charcoal knight cadet uniform of Raven Hall with a worn silver falcon crest, long old longsword at the hip, small pen-nib shaped burn scar on the right palm, neutral calm expression
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 5 times in an evenly spaced grid of 3 columns and 2 rows, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 17-year-old boy named Lennox, ash-silver messy hair, grey eyes, sharp jawline, faint dark circles, black and charcoal knight cadet uniform of Raven Hall with a worn silver falcon crest, long old longsword at the hip, small pen-nib shaped burn scar on the right palm, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) angry frown, gritted teeth, (4) sad downcast eyes, holding back tears, (5) surprised wide eyes, slightly open mouth, the last cell is left completely empty
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/lennox_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 레녹스 그레이번 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/kaien_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 카이엔 브라트 — 표정 5종 (3열×2행)
+- **권장 해상도 / 비율**: 2160×2560 / 27:32
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`) / 2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old boy named Lennox, ash-silver messy hair, grey eyes, sharp jawline, faint dark circles, black and charcoal knight cadet uniform of Raven Hall with a worn silver falcon crest, long old longsword at the hip, small pen-nib shaped burn scar on the right palm, gentle warm smile
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 5 times in an evenly spaced grid of 3 columns and 2 rows, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 18-year-old tall muscular boy named Kaien, short messy red hair, freckles across the nose, rolled-up sleeves, scuffed Raven Hall cadet uniform, large hand-forged round iron shield on the back, small bronze badge on the chest, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) angry frown, gritted teeth, (4) sad downcast eyes, holding back tears, (5) surprised wide eyes, slightly open mouth, the last cell is left completely empty
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/lennox_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 레녹스 그레이번 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/vivienne_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 비비안 로셰 — 표정 5종 (3열×2행)
+- **권장 해상도 / 비율**: 2160×2560 / 27:32
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`) / 2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old boy named Lennox, ash-silver messy hair, grey eyes, sharp jawline, faint dark circles, black and charcoal knight cadet uniform of Raven Hall with a worn silver falcon crest, long old longsword at the hip, small pen-nib shaped burn scar on the right palm, angry frown, gritted teeth
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 5 times in an evenly spaced grid of 3 columns and 2 rows, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 17-year-old noble girl named Vivienne, long straight silver-blue hair with a frost-flower hairpin, pale blue eyes, elegant posture, white and navy Swan Hall mage uniform, short cape with a frost-flower ducal crest, slim silver crystal staff, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) angry frown, gritted teeth, (4) sad downcast eyes, holding back tears, (5) surprised wide eyes, slightly open mouth, the last cell is left completely empty
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/lennox_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 레녹스 그레이번 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/roland_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 롤랑 드 베르니에 — 표정 5종 (3열×2행)
+- **권장 해상도 / 비율**: 2160×2560 / 27:32
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`) / 2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old boy named Lennox, ash-silver messy hair, grey eyes, sharp jawline, faint dark circles, black and charcoal knight cadet uniform of Raven Hall with a worn silver falcon crest, long old longsword at the hip, small pen-nib shaped burn scar on the right palm, sad downcast eyes, holding back tears
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 5 times in an evenly spaced grid of 3 columns and 2 rows, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 18-year-old slender boy named Roland, wavy blond hair tied low at the nape, amber eyes, immaculate white Swan Hall uniform with a gold-trimmed short cape, a gold coin engraved with a white star between his fingers, dice charm on the belt, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) angry frown, gritted teeth, (4) sad downcast eyes, holding back tears, (5) surprised wide eyes, slightly open mouth, the last cell is left completely empty
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/lennox_surprised.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 레녹스 그레이번 — 놀람
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/mireille_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 미레유 그레이번 — 표정 5종 (3열×2행)
+- **권장 해상도 / 비율**: 2160×2560 / 27:32
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`) / 2행: 슬픔(`sad`) · 놀람(`surprised`) · (빈칸)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old boy named Lennox, ash-silver messy hair, grey eyes, sharp jawline, faint dark circles, black and charcoal knight cadet uniform of Raven Hall with a worn silver falcon crest, long old longsword at the hip, small pen-nib shaped burn scar on the right palm, surprised wide eyes, slightly open mouth
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 5 times in an evenly spaced grid of 3 columns and 2 rows, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 15-year-old girl named Mireille, ash-silver hair in a neat side braid, soft grey eyes, white church healer apron over a pale grey Sanctum uniform, small silver staff with a tiny lantern charm, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) angry frown, gritted teeth, (4) sad downcast eyes, holding back tears, (5) surprised wide eyes, slightly open mouth, the last cell is left completely empty
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/kaien_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 카이엔 브라트 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/seraphine_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 세라핀 루엘 — 표정 6종 (3열×2행)
+- **권장 해상도 / 비율**: 2160×2560 / 27:32
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 분노(`angry`) / 2행: 슬픔(`sad`) · 놀람(`surprised`) · 무표정(퀘스트 상태)(`blank`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old tall muscular boy named Kaien, short messy red hair, freckles across the nose, rolled-up sleeves, scuffed Raven Hall cadet uniform, large hand-forged round iron shield on the back, small bronze badge on the chest, neutral calm expression
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 6 times in an evenly spaced grid of 3 columns and 2 rows, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 17-year-old girl named Seraphine, chocolate-brown bob haircut, warm brown eyes, plain worn scholarship-issue Raven Hall uniform, simple training sword, faint translucent empty rectangular window motif floating beside her, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) angry frown, gritted teeth, (4) sad downcast eyes, holding back tears, (5) surprised wide eyes, slightly open mouth, (6) empty glassy eyes with faint white glyph reflections, emotionless puppet-like face
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/kaien_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 카이엔 브라트 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/hester_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 헤스터 크레인 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old tall muscular boy named Kaien, short messy red hair, freckles across the nose, rolled-up sleeves, scuffed Raven Hall cadet uniform, large hand-forged round iron shield on the back, small bronze badge on the chest, gentle warm smile
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, ageless woman librarian named Hester, grey hair in a loose bun, grey knitted shawl, ink-stained fingertips, round spectacles, holding an old silver-thread bookmark, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) sad downcast eyes, holding back tears
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/kaien_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 카이엔 브라트 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/belgrave_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 오스왈드 벨그레이브 — 표정 4종 (2열×2행)
+- **권장 해상도 / 비율**: 1440×2560 / 9:16
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) / 2행: 냉정(`cold`) · 슬픔(`sad`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old tall muscular boy named Kaien, short messy red hair, freckles across the nose, rolled-up sleeves, scuffed Raven Hall cadet uniform, large hand-forged round iron shield on the back, small bronze badge on the chest, angry frown, gritted teeth
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 4 times in an evenly spaced grid of 2 columns and 2 rows, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, elderly academy headmaster named Oswald Belgrave, long silver beard, deep brown and gold academic robes, carved wooden staff, kind grandfatherly face, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) polite smile but cold empty eyes, unsettling, (4) sad downcast eyes, holding back tears
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/kaien_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 카이엔 브라트 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/julian_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 율리안 하이든 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 분노(`angry`) · 슬픔(`sad`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old tall muscular boy named Kaien, short messy red hair, freckles across the nose, rolled-up sleeves, scuffed Raven Hall cadet uniform, large hand-forged round iron shield on the back, small bronze badge on the chest, sad downcast eyes, holding back tears
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 19-year-old student council president named Julian, short dark wine-red hair, sharp red eyes, perfect posture, crimson-trimmed formal knight uniform with council sash, rapier in an ornate scabbard, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) angry frown, gritted teeth, (3) sad downcast eyes, holding back tears
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/kaien_surprised.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 카이엔 브라트 — 놀람
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/magda_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 마그다 오르테가 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 분노(`angry`) · 미소(`smile`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old tall muscular boy named Kaien, short messy red hair, freckles across the nose, rolled-up sleeves, scuffed Raven Hall cadet uniform, large hand-forged round iron shield on the back, small bronze badge on the chest, surprised wide eyes, slightly open mouth
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, veteran female knight instructor in her forties named Magda, cropped brown hair, scar across the left cheek, muscular build, practical leather and steel training armor, wooden training sword over the shoulder, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) angry frown, gritted teeth, (3) gentle warm smile
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/vivienne_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 비비안 로셰 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/bruno_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 브루노 카스텔 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 분노(`angry`) · 겁먹음(`scared`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old noble girl named Vivienne, long straight silver-blue hair with a frost-flower hairpin, pale blue eyes, elegant posture, white and navy Swan Hall mage uniform, short cape with a frost-flower ducal crest, slim silver crystal staff, neutral calm expression
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 17-year-old arrogant noble boy named Bruno, slicked-back dark green hair, Stag Hall uniform worn sloppily with an open collar, fancy rapier, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) angry frown, gritted teeth, (3) frightened expression, shrinking posture
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/vivienne_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 비비안 로셰 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/finn_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 핀 애셔 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 겁먹음(`scared`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old noble girl named Vivienne, long straight silver-blue hair with a frost-flower hairpin, pale blue eyes, elegant posture, white and navy Swan Hall mage uniform, short cape with a frost-flower ducal crest, slim silver crystal staff, gentle warm smile
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 16-year-old skinny timid boy named Finn, messy dull brown hair, freckles, oversized worn Raven Hall uniform, holding a small grey whetstone with both hands, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) frightened expression, shrinking posture
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/vivienne_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 비비안 로셰 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/ashen_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 잿빛 왕 (아르딘) — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old noble girl named Vivienne, long straight silver-blue hair with a frost-flower hairpin, pale blue eyes, elegant posture, white and navy Swan Hall mage uniform, short cape with a frost-flower ducal crest, slim silver crystal staff, angry frown, gritted teeth
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, the Ashen King, young man in his twenties with ash-grey hair, tired dark eyes, cracked compass-shaped crown made of ash, tattered grey royal coat over a modern grey hoodie, ash particles drifting around him, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) sad downcast eyes, holding back tears
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/vivienne_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 비비안 로셰 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/real_lennox_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 진짜 레녹스 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 슬픔(`sad`) · 미소(`smile`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old noble girl named Vivienne, long straight silver-blue hair with a frost-flower hairpin, pale blue eyes, elegant posture, white and navy Swan Hall mage uniform, short cape with a frost-flower ducal crest, slim silver crystal staff, sad downcast eyes, holding back tears
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, the true Lennox, same face as Lennox but colder and more fragile, hair slightly longer, standing on the other side of a mirror surface, faintly translucent edges, black mourning coat, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) sad downcast eyes, holding back tears, (3) gentle warm smile
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/vivienne_surprised.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 비비안 로셰 — 놀람
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/martha_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 마르타 브라트 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old noble girl named Vivienne, long straight silver-blue hair with a frost-flower hairpin, pale blue eyes, elegant posture, white and navy Swan Hall mage uniform, short cape with a frost-flower ducal crest, slim silver crystal staff, surprised wide eyes, slightly open mouth
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, 21-year-old woman named Martha, red hair in a high ponytail, freckles, confident build, faded duel champion sash over a Raven Hall knight uniform, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) sad downcast eyes, holding back tears
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/roland_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 롤랑 드 베르니에 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
+### `assets/char/eleanor_sheet.png`
+- **용도**: 대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280) — 엘레노어 로셰 — 표정 3종 (3열×1행)
+- **권장 해상도 / 비율**: 2160×1280 / 27:16
+- **칸 배치**: 1행: 기본(`normal`) · 미소(`smile`) · 슬픔(`sad`)
 - **프롬프트**:
 ```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old slender boy named Roland, wavy blond hair tied low at the nape, amber eyes, immaculate white Swan Hall uniform with a gold-trimmed short cape, a gold coin engraved with a white star between his fingers, dice charm on the belt, neutral calm expression
+anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, character expression sheet of one single character, the same person drawn 3 times in an evenly spaced grid of 3 columns and 1 row, identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, wide empty margin between cells, plain flat light grey background, no grid lines, no borders, elegant woman in her late thirties named Eleanor, long silver-blue hair like her daughter Vivienne, pale blue gown, frost-flower brooch, soft gentle eyes, expressions in reading order from left to right, top to bottom: (1) neutral calm expression, (2) gentle warm smile, (3) sad downcast eyes, holding back tears
 ```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+- **네거티브**: 공통 네거티브 + `different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery`
 
-### `assets/char/roland_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 롤랑 드 베르니에 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old slender boy named Roland, wavy blond hair tied low at the nape, amber eyes, immaculate white Swan Hall uniform with a gold-trimmed short cape, a gold coin engraved with a white star between his fingers, dice charm on the belt, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
+## 2. 전투 초상화 (선택)
 
-### `assets/char/roland_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 롤랑 드 베르니에 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old slender boy named Roland, wavy blond hair tied low at the nape, amber eyes, immaculate white Swan Hall uniform with a gold-trimmed short cape, a gold coin engraved with a white star between his fingers, dice charm on the belt, angry frown, gritted teeth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/roland_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 롤랑 드 베르니에 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old slender boy named Roland, wavy blond hair tied low at the nape, amber eyes, immaculate white Swan Hall uniform with a gold-trimmed short cape, a gold coin engraved with a white star between his fingers, dice charm on the belt, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/roland_surprised.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 롤랑 드 베르니에 — 놀람
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 18-year-old slender boy named Roland, wavy blond hair tied low at the nape, amber eyes, immaculate white Swan Hall uniform with a gold-trimmed short cape, a gold coin engraved with a white star between his fingers, dice charm on the belt, surprised wide eyes, slightly open mouth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/mireille_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 미레유 그레이번 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 15-year-old girl named Mireille, ash-silver hair in a neat side braid, soft grey eyes, white church healer apron over a pale grey Sanctum uniform, small silver staff with a tiny lantern charm, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/mireille_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 미레유 그레이번 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 15-year-old girl named Mireille, ash-silver hair in a neat side braid, soft grey eyes, white church healer apron over a pale grey Sanctum uniform, small silver staff with a tiny lantern charm, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/mireille_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 미레유 그레이번 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 15-year-old girl named Mireille, ash-silver hair in a neat side braid, soft grey eyes, white church healer apron over a pale grey Sanctum uniform, small silver staff with a tiny lantern charm, angry frown, gritted teeth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/mireille_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 미레유 그레이번 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 15-year-old girl named Mireille, ash-silver hair in a neat side braid, soft grey eyes, white church healer apron over a pale grey Sanctum uniform, small silver staff with a tiny lantern charm, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/mireille_surprised.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 미레유 그레이번 — 놀람
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 15-year-old girl named Mireille, ash-silver hair in a neat side braid, soft grey eyes, white church healer apron over a pale grey Sanctum uniform, small silver staff with a tiny lantern charm, surprised wide eyes, slightly open mouth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/seraphine_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 세라핀 루엘 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old girl named Seraphine, chocolate-brown bob haircut, warm brown eyes, plain worn scholarship-issue Raven Hall uniform, simple training sword, faint translucent empty rectangular window motif floating beside her, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/seraphine_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 세라핀 루엘 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old girl named Seraphine, chocolate-brown bob haircut, warm brown eyes, plain worn scholarship-issue Raven Hall uniform, simple training sword, faint translucent empty rectangular window motif floating beside her, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/seraphine_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 세라핀 루엘 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old girl named Seraphine, chocolate-brown bob haircut, warm brown eyes, plain worn scholarship-issue Raven Hall uniform, simple training sword, faint translucent empty rectangular window motif floating beside her, angry frown, gritted teeth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/seraphine_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 세라핀 루엘 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old girl named Seraphine, chocolate-brown bob haircut, warm brown eyes, plain worn scholarship-issue Raven Hall uniform, simple training sword, faint translucent empty rectangular window motif floating beside her, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/seraphine_surprised.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 세라핀 루엘 — 놀람
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old girl named Seraphine, chocolate-brown bob haircut, warm brown eyes, plain worn scholarship-issue Raven Hall uniform, simple training sword, faint translucent empty rectangular window motif floating beside her, surprised wide eyes, slightly open mouth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/seraphine_blank.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 세라핀 루엘 — 무표정(퀘스트 상태)
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old girl named Seraphine, chocolate-brown bob haircut, warm brown eyes, plain worn scholarship-issue Raven Hall uniform, simple training sword, faint translucent empty rectangular window motif floating beside her, empty glassy eyes with faint white glyph reflections, emotionless puppet-like face
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/hester_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 헤스터 크레인 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, ageless woman librarian named Hester, grey hair in a loose bun, grey knitted shawl, ink-stained fingertips, round spectacles, holding an old silver-thread bookmark, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/hester_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 헤스터 크레인 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, ageless woman librarian named Hester, grey hair in a loose bun, grey knitted shawl, ink-stained fingertips, round spectacles, holding an old silver-thread bookmark, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/hester_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 헤스터 크레인 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, ageless woman librarian named Hester, grey hair in a loose bun, grey knitted shawl, ink-stained fingertips, round spectacles, holding an old silver-thread bookmark, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/belgrave_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 오스왈드 벨그레이브 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, elderly academy headmaster named Oswald Belgrave, long silver beard, deep brown and gold academic robes, carved wooden staff, kind grandfatherly face, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/belgrave_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 오스왈드 벨그레이브 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, elderly academy headmaster named Oswald Belgrave, long silver beard, deep brown and gold academic robes, carved wooden staff, kind grandfatherly face, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/belgrave_cold.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 오스왈드 벨그레이브 — 냉정
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, elderly academy headmaster named Oswald Belgrave, long silver beard, deep brown and gold academic robes, carved wooden staff, kind grandfatherly face, polite smile but cold empty eyes, unsettling
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/belgrave_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 오스왈드 벨그레이브 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, elderly academy headmaster named Oswald Belgrave, long silver beard, deep brown and gold academic robes, carved wooden staff, kind grandfatherly face, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/julian_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 율리안 하이든 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 19-year-old student council president named Julian, short dark wine-red hair, sharp red eyes, perfect posture, crimson-trimmed formal knight uniform with council sash, rapier in an ornate scabbard, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/julian_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 율리안 하이든 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 19-year-old student council president named Julian, short dark wine-red hair, sharp red eyes, perfect posture, crimson-trimmed formal knight uniform with council sash, rapier in an ornate scabbard, angry frown, gritted teeth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/julian_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 율리안 하이든 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 19-year-old student council president named Julian, short dark wine-red hair, sharp red eyes, perfect posture, crimson-trimmed formal knight uniform with council sash, rapier in an ornate scabbard, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/magda_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 마그다 오르테가 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, veteran female knight instructor in her forties named Magda, cropped brown hair, scar across the left cheek, muscular build, practical leather and steel training armor, wooden training sword over the shoulder, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/magda_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 마그다 오르테가 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, veteran female knight instructor in her forties named Magda, cropped brown hair, scar across the left cheek, muscular build, practical leather and steel training armor, wooden training sword over the shoulder, angry frown, gritted teeth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/magda_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 마그다 오르테가 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, veteran female knight instructor in her forties named Magda, cropped brown hair, scar across the left cheek, muscular build, practical leather and steel training armor, wooden training sword over the shoulder, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/bruno_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 브루노 카스텔 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old arrogant noble boy named Bruno, slicked-back dark green hair, Stag Hall uniform worn sloppily with an open collar, fancy rapier, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/bruno_angry.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 브루노 카스텔 — 분노
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old arrogant noble boy named Bruno, slicked-back dark green hair, Stag Hall uniform worn sloppily with an open collar, fancy rapier, angry frown, gritted teeth
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/bruno_scared.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 브루노 카스텔 — 겁먹음
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 17-year-old arrogant noble boy named Bruno, slicked-back dark green hair, Stag Hall uniform worn sloppily with an open collar, fancy rapier, frightened expression, shrinking posture
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/finn_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 핀 애셔 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 16-year-old skinny timid boy named Finn, messy dull brown hair, freckles, oversized worn Raven Hall uniform, holding a small grey whetstone with both hands, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/finn_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 핀 애셔 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 16-year-old skinny timid boy named Finn, messy dull brown hair, freckles, oversized worn Raven Hall uniform, holding a small grey whetstone with both hands, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/finn_scared.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 핀 애셔 — 겁먹음
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 16-year-old skinny timid boy named Finn, messy dull brown hair, freckles, oversized worn Raven Hall uniform, holding a small grey whetstone with both hands, frightened expression, shrinking posture
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/ashen_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 잿빛 왕 (아르딘) — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, the Ashen King, young man in his twenties with ash-grey hair, tired dark eyes, cracked compass-shaped crown made of ash, tattered grey royal coat over a modern grey hoodie, ash particles drifting around him, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/ashen_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 잿빛 왕 (아르딘) — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, the Ashen King, young man in his twenties with ash-grey hair, tired dark eyes, cracked compass-shaped crown made of ash, tattered grey royal coat over a modern grey hoodie, ash particles drifting around him, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/ashen_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 잿빛 왕 (아르딘) — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, the Ashen King, young man in his twenties with ash-grey hair, tired dark eyes, cracked compass-shaped crown made of ash, tattered grey royal coat over a modern grey hoodie, ash particles drifting around him, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/real_lennox_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 진짜 레녹스 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, the true Lennox, same face as Lennox but colder and more fragile, hair slightly longer, standing on the other side of a mirror surface, faintly translucent edges, black mourning coat, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/real_lennox_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 진짜 레녹스 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, the true Lennox, same face as Lennox but colder and more fragile, hair slightly longer, standing on the other side of a mirror surface, faintly translucent edges, black mourning coat, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/real_lennox_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 진짜 레녹스 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, the true Lennox, same face as Lennox but colder and more fragile, hair slightly longer, standing on the other side of a mirror surface, faintly translucent edges, black mourning coat, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/martha_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 마르타 브라트 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 21-year-old woman named Martha, red hair in a high ponytail, freckles, confident build, faded duel champion sash over a Raven Hall knight uniform, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/martha_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 마르타 브라트 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 21-year-old woman named Martha, red hair in a high ponytail, freckles, confident build, faded duel champion sash over a Raven Hall knight uniform, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/martha_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 마르타 브라트 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, 21-year-old woman named Martha, red hair in a high ponytail, freckles, confident build, faded duel champion sash over a Raven Hall knight uniform, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/eleanor_normal.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 엘레노어 로셰 — 기본
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, elegant woman in her late thirties named Eleanor, long silver-blue hair like her daughter Vivienne, pale blue gown, frost-flower brooch, soft gentle eyes, neutral calm expression
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/eleanor_smile.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 엘레노어 로셰 — 미소
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, elegant woman in her late thirties named Eleanor, long silver-blue hair like her daughter Vivienne, pale blue gown, frost-flower brooch, soft gentle eyes, gentle warm smile
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-### `assets/char/eleanor_sad.png`
-- **용도**: 대화 스탠딩 (투명 배경 PNG) — 엘레노어 로셰 — 슬픔
-- **권장 해상도 / 비율**: 1080×1920 / 9:16
-- **프롬프트**:
-```
-anime gacha game art, western dark fantasy academy, cel shading with soft painterly lighting, clean confident lineart, muted palette of slate grey, deep navy and antique gold with one accent color per character, high detail, consistent character design, 2D illustration, full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery, elegant woman in her late thirties named Eleanor, long silver-blue hair like her daughter Vivienne, pale blue gown, frost-flower brooch, soft gentle eyes, sad downcast eyes, holding back tears
-```
-- **네거티브**: 공통 네거티브 + `background scenery, multiple characters, cut off feet`
-
-## 2. 전투 초상화
+> 선택 항목. 파일이 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓰므로, 따로 그리지 않아도 된다.
 
 ### `assets/portrait/lennox.png`
-- **용도**: 전투 카드·편성 초상화 — 레녹스 그레이번
+- **용도**: (선택) 전투 카드·편성 초상화 — 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓴다 — 레녹스 그레이번
 - **권장 해상도 / 비율**: 512×512 / 1:1
 - **프롬프트**:
 ```
@@ -631,7 +270,7 @@ anime gacha game art, western dark fantasy academy, cel shading with soft painte
 - **네거티브**: 공통 네거티브
 
 ### `assets/portrait/kaien.png`
-- **용도**: 전투 카드·편성 초상화 — 카이엔 브라트
+- **용도**: (선택) 전투 카드·편성 초상화 — 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓴다 — 카이엔 브라트
 - **권장 해상도 / 비율**: 512×512 / 1:1
 - **프롬프트**:
 ```
@@ -640,7 +279,7 @@ anime gacha game art, western dark fantasy academy, cel shading with soft painte
 - **네거티브**: 공통 네거티브
 
 ### `assets/portrait/vivienne.png`
-- **용도**: 전투 카드·편성 초상화 — 비비안 로셰
+- **용도**: (선택) 전투 카드·편성 초상화 — 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓴다 — 비비안 로셰
 - **권장 해상도 / 비율**: 512×512 / 1:1
 - **프롬프트**:
 ```
@@ -649,7 +288,7 @@ anime gacha game art, western dark fantasy academy, cel shading with soft painte
 - **네거티브**: 공통 네거티브
 
 ### `assets/portrait/roland.png`
-- **용도**: 전투 카드·편성 초상화 — 롤랑 드 베르니에
+- **용도**: (선택) 전투 카드·편성 초상화 — 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓴다 — 롤랑 드 베르니에
 - **권장 해상도 / 비율**: 512×512 / 1:1
 - **프롬프트**:
 ```
@@ -658,7 +297,7 @@ anime gacha game art, western dark fantasy academy, cel shading with soft painte
 - **네거티브**: 공통 네거티브
 
 ### `assets/portrait/mireille.png`
-- **용도**: 전투 카드·편성 초상화 — 미레유 그레이번
+- **용도**: (선택) 전투 카드·편성 초상화 — 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓴다 — 미레유 그레이번
 - **권장 해상도 / 비율**: 512×512 / 1:1
 - **프롬프트**:
 ```
@@ -667,7 +306,7 @@ anime gacha game art, western dark fantasy academy, cel shading with soft painte
 - **네거티브**: 공통 네거티브
 
 ### `assets/portrait/seraphine.png`
-- **용도**: 전투 카드·편성 초상화 — 세라핀 루엘
+- **용도**: (선택) 전투 카드·편성 초상화 — 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓴다 — 세라핀 루엘
 - **권장 해상도 / 비율**: 512×512 / 1:1
 - **프롬프트**:
 ```

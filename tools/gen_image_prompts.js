@@ -14,8 +14,8 @@ const NEG = 'lowres, blurry, jpeg artifacts, watermark, signature, text, letters
   '3d render, photorealistic, chibi, oversaturated neon colors, cropped head, duplicate character, modern city';
 
 const SPEC = {
-  char:     { res: '1080×1920', ratio: '9:16', use: '대화 스탠딩 (투명 배경 PNG)', frame: 'full body standing sprite, three-quarter view, centered, whole body visible from head to feet, plain transparent background, no background scenery' },
-  portrait: { res: '512×512', ratio: '1:1', use: '전투 카드·편성 초상화', frame: 'bust portrait, head and shoulders, facing slightly left, simple dark vignette background' },
+  sheet:    { res: '', ratio: '', use: '대화 스탠딩 표정 시트 (투명 배경 PNG 권장)', frame: '' },
+  portrait: { res: '512×512', ratio: '1:1', use: '(선택) 전투 카드·편성 초상화 — 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓴다', frame: 'bust portrait, head and shoulders, facing slightly left, simple dark vignette background' },
   cutin:    { res: '1920×640', ratio: '3:1', use: '극의(궁극기) 컷인 연출', frame: 'ultra wide dynamic action cut-in banner, dramatic diagonal composition, speed lines, character on the right third, glowing effects' },
   enemy:    { res: '768×768', ratio: '1:1', use: '전투 적 초상화', frame: 'creature or character portrait, centered, dark vignette background, menacing pose' },
   boss:     { res: '1024×1024', ratio: '1:1', use: '전투 보스 초상화', frame: 'boss portrait, imposing full presence, centered, dramatic rim light, dark vignette background' },
@@ -183,19 +183,37 @@ const used = new Set();
 const script = new Game.Script(D);
 script.ops.forEach((op) => { if (op.t === 'cmd' && op.cmd === 'show') used.add(op.args.split(/\s+/)[0].split(':')[0]); });
 const entries = [];
-function add(group, file, kind, title, subject, extra) {
-  const spec = SPEC[kind];
+function add(group, file, kind, title, subject, extra, specOverride, note) {
+  const spec = Object.assign({}, SPEC[kind], specOverride || {});
   if (!subject) throw new Error('묘사 없음: ' + file);
   const prompt = [STYLE, spec.frame, subject, extra].filter(Boolean).join(', ');
-  entries.push({ group, file, kind, title, spec, prompt });
+  entries.push({ group, file, kind, title, spec, prompt, note });
 }
-// 스탠딩
+const OPTIONAL_GROUPS = ['2. 전투 초상화 (선택)'];
+function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+// 스탠딩: 인물 1명 = 표정 시트 1장 (프롬프트 1회로 모든 표정)
+const sheetRows = [];
 Object.keys(D.characters).concat(Object.keys(D.npcs)).forEach((id) => {
   const c = D.characters[id] || D.npcs[id];
   if (!D.characters[id] && !used.has(id)) return;
-  c.expressions.forEach((ex) => add('1. 캐릭터 스탠딩', `assets/char/${id}_${ex}.png`, 'char', `${c.fullName || c.name} — ${EXPR_KO[ex] || ex}`, CHAR[id], EXPR[ex]));
+  const n = c.expressions.length, lay = Game.Assets.sheetLayout(n), cells = lay.cols * lay.rows;
+  const g = gcd(lay.cols * 9, lay.rows * 16);
+  const frame = `character expression sheet of one single character, the same person drawn ${n} times in an evenly spaced grid of ${lay.cols} columns and ${lay.rows} row${lay.rows > 1 ? 's' : ''}, ` +
+    'identical outfit, hairstyle, body pose, size and camera angle in every cell, only the facial expression changes, ' +
+    'each figure is a full body standing sprite in three-quarter view centered in its own equal-size cell with head and feet fully visible, ' +
+    'wide empty margin between cells, plain flat light grey background, no grid lines, no borders';
+  const order = 'expressions in reading order from left to right, top to bottom: ' +
+    c.expressions.map((ex, i) => `(${i + 1}) ${EXPR[ex]}`).join(', ') + (cells > n ? `, the last cell is left completely empty` : '');
+  const grid = [];
+  for (let r = 0; r < lay.rows; r++) {
+    grid.push(`${r + 1}행: ` + Array.from({ length: lay.cols }, (_, k) => { const ex = c.expressions[r * lay.cols + k]; return ex ? `${EXPR_KO[ex]}(\`${ex}\`)` : '(빈칸)'; }).join(' · '));
+  }
+  const res = `${lay.cols * 720}×${lay.rows * 1280}`;
+  add('1. 캐릭터 표정 시트', `assets/char/${id}_sheet.png`, 'sheet', `${c.fullName || c.name} — 표정 ${n}종 (${lay.cols}열×${lay.rows}행)`,
+    CHAR[id], order, { frame, res, ratio: `${lay.cols * 9 / g}:${lay.rows * 16 / g}`, use: `대화 스탠딩 표정 시트 — 칸 하나가 9:16 (권장 720×1280)` }, grid.join(' / '));
+  sheetRows.push(`| \`${id}\` | ${c.fullName || c.name} | ${n} | ${lay.cols}×${lay.rows} | ${res} | ${grid.join('<br>')} |`);
 });
-Object.keys(D.characters).forEach((id) => add('2. 전투 초상화', `assets/portrait/${id}.png`, 'portrait', D.characters[id].fullName, CHAR[id], 'determined expression'));
+Object.keys(D.characters).forEach((id) => add('2. 전투 초상화 (선택)', `assets/portrait/${id}.png`, 'portrait', D.characters[id].fullName, CHAR[id], 'determined expression'));
 Object.keys(D.characters).forEach((id) => add('3. 극의 컷인', `assets/cutin/${id}_ult.png`, 'cutin', `${D.characters[id].fullName} — 「${D.skills[D.characters[id].ult].name}」`, CHAR[id], ULT[id]));
 Object.keys(D.enemies).forEach((id) => {
   const e = D.enemies[id];
@@ -210,11 +228,26 @@ Object.keys(D.elements).forEach((k) => add('9. UI 아이콘 — 속성', D.eleme
 Object.keys(D.statuses).forEach((k) => add('10. UI 아이콘 — 상태이상', D.statuses[k].icon, 'icon', `상태: ${D.statuses[k].name}`, STATUS_ICON[k]));
 
 // ------------------------------------------------------------------ 문서 출력
+const groups = [...new Set(entries.map((e) => e.group))];
+const required = entries.filter((e) => !OPTIONAL_GROUPS.includes(e.group));
+const optional = entries.filter((e) => OPTIONAL_GROUPS.includes(e.group));
+const sheetEntries = entries.filter((e) => e.kind === 'sheet');
+const exprTotal = Object.keys(D.characters).concat(Object.keys(D.npcs))
+  .filter((id) => D.characters[id] || used.has(id))
+  .reduce((n, id) => n + (D.characters[id] || D.npcs[id]).expressions.length, 0);
+const NEG_EXTRA = {
+  sheet: 'different outfits between cells, different characters, inconsistent face, overlapping figures, cropped feet, text labels, numbers, grid lines, background scenery',
+  icon: 'background, gradient background, realistic shading',
+  bg: 'people, characters, crowd in foreground'
+};
 let md = `# IMAGE PROMPTS — 「잿빛 매와 별의 장부」
 
 > 이 문서는 \`node tools/gen_image_prompts.js\`로 생성된다. 게임 데이터가 실제로 참조하는 이미지 경로를 전부 모아 만들기 때문에, 여기 적힌 **파일 경로 그대로** 저장하면 게임에 바로 반영된다.
 > 이미지를 넣은 뒤에는 \`node tools/scan_assets.js\`를 실행해 이미지 매니페스트(\`data/assets.js\`)를 갱신한다. (Node가 없다면 \`data/assets.js\`의 \`files\` 배열에 경로를 직접 추가하거나 \`probeAll: true\`로 바꾼다.)
 > 파일이 없으면 게임은 색 블록 + 이름 텍스트로 대신 표시한다.
+
+**프롬프트 실행 횟수: 필수 ${required.length}회** (선택 ${optional.length}회 별도).
+인물 스탠딩은 **표정 시트** 방식이라, 인물 한 명당 프롬프트 1번으로 표정 3~6종을 한 장에 받는다. 표정을 하나씩 뽑으면 ${exprTotal}번이 필요하지만 시트로는 ${sheetEntries.length}번이면 된다. 게임이 시트를 칸 단위로 잘라 쓴다.
 
 ## 공통 스타일 (모든 프롬프트 맨 앞에 포함됨)
 
@@ -228,31 +261,52 @@ ${STYLE}
 ${NEG}
 \`\`\`
 
+## 표정 시트 사용법
+
+1. 아래 「1. 캐릭터 표정 시트」의 프롬프트를 **한 번** 실행한다. 칸은 표의 순서(왼쪽→오른쪽, 위→아래)대로 표정이 들어가야 한다.
+2. 결과가 칸 순서와 다르면 이미지 편집기에서 칸을 옮기거나, 원하는 표정이 나올 때까지 다시 뽑는다.
+3. 가능하면 **배경을 제거해 투명 PNG**로 저장한다. 단색 배경 그대로 써도 동작하지만 인물 뒤에 회색 상자가 보인다.
+4. \`assets/char/<인물ID>_sheet.png\`로 저장하고 \`node tools/scan_assets.js\`를 실행한다.
+
+- 게임은 이미지 크기를 칸 수(열·행)로 똑같이 나눠 한 칸씩 잘라 쓴다. 비율이 조금 달라도 잘리긴 하지만, **권장 비율을 맞출수록 인물이 칸 중앙에 정확히 들어온다.**
+- 칸 배치 규칙: 표정 1~3개 → 한 줄, 4개 → 2×2, 5~6개 → 3×2(5개면 마지막 칸은 비움).
+- 우선순위: \`assets/char/<인물ID>_<표정>.png\` 개별 파일이 있으면 그것을, 없으면 시트를 쓴다. 특정 표정만 따로 고치고 싶을 때는 개별 파일로 덮어쓰면 된다.
+- 전투·편성 초상화(\`assets/portrait/<ID>.png\`)는 **선택**이다. 없으면 시트의 「기본」 칸에서 머리~어깨를 잘라 쓴다.
+
+| ID | 인물 | 표정 수 | 배치(열×행) | 권장 해상도 | 칸 순서 |
+|---|---|---|---|---|---|
+${sheetRows.join('\n')}
+
 ## 제작 가이드
 
 - **일관성**: 같은 인물은 아래 '인물 묘사'를 토씨 하나 바꾸지 말고 재사용한다. 가능하면 같은 시드 / 캐릭터 레퍼런스(IP-Adapter, 캐릭터 LoRA 등)를 쓴다.
-- **스탠딩**은 투명 배경 PNG, 발끝까지 보이게. 게임은 화면 높이의 약 82%(모바일 62%)로 아래 정렬해 표시한다.
+- **스탠딩**은 발끝까지 보이게. 게임은 칸 하나를 화면 높이의 약 82%(모바일 62%)로 아래 정렬해 표시한다.
 - **아이콘**은 16~24px로 축소되어 보이므로 실루엣이 분명해야 한다.
 - 한글·영문 글자가 그림에 들어가지 않도록 한다(로고는 프레임만 만들고 글자는 편집 프로그램에서 넣는다). 단, 시계탑 낙서 CG는 글자 위치만 잡고 한글은 후보정으로 넣는 것을 권장한다.
 
-| 구분 | 권장 해상도 | 비율 | 개수 |
+| 구분 | 권장 해상도 | 비율 | 실행 횟수 |
 |---|---|---|---|
 `;
-const groups = [...new Set(entries.map((e) => e.group))];
 groups.forEach((g) => {
   const list = entries.filter((e) => e.group === g);
-  md += `| ${g} | ${list[0].spec.res} | ${list[0].spec.ratio} | ${list.length} |\n`;
+  const uniq = (k) => [...new Set(list.map((e) => e.spec[k]))].join(' / ');
+  const isSheet = list[0].kind === 'sheet';
+  md += `| ${g} | ${isSheet ? '인물별 (위 표)' : uniq('res')} | ${isSheet ? '인물별' : uniq('ratio')} | ${list.length} |\n`;
 });
-md += `| **합계** | | | **${entries.length}** |\n\n`;
-md += `## 인물 묘사 (고정 문구)\n\n| ID | 묘사 |\n|---|---|\n`;
+md += `| **필수 합계** | | | **${required.length}** |\n`;
+if (optional.length) md += `| (선택 포함 시) | | | ${entries.length} |\n`;
+md += `\n## 인물 묘사 (고정 문구)\n\n| ID | 묘사 |\n|---|---|\n`;
 Object.keys(CHAR).forEach((id) => { if (D.characters[id] || used.has(id)) md += `| \`${id}\` | ${CHAR[id]} |\n`; });
 md += '\n';
 groups.forEach((g) => {
   md += `\n## ${g}\n`;
+  if (OPTIONAL_GROUPS.includes(g)) md += '\n> 선택 항목. 파일이 없으면 표정 시트의 「기본」 칸에서 상반신을 잘라 쓰므로, 따로 그리지 않아도 된다.\n';
   entries.filter((e) => e.group === g).forEach((e) => {
-    md += `\n### \`${e.file}\`\n- **용도**: ${e.spec.use} — ${e.title}\n- **권장 해상도 / 비율**: ${e.spec.res} / ${e.spec.ratio}\n- **프롬프트**:\n\`\`\`\n${e.prompt}\n\`\`\`\n- **네거티브**: 공통 네거티브${e.kind === 'char' ? ' + `background scenery, multiple characters, cut off feet`' : e.kind === 'icon' ? ' + `background, gradient background, realistic shading`' : e.kind === 'bg' ? ' + `people, characters, crowd in foreground`' : ''}\n`;
+    md += `\n### \`${e.file}\`\n- **용도**: ${e.spec.use} — ${e.title}\n- **권장 해상도 / 비율**: ${e.spec.res} / ${e.spec.ratio}\n`;
+    if (e.note) md += `- **칸 배치**: ${e.note}\n`;
+    md += `- **프롬프트**:\n\`\`\`\n${e.prompt}\n\`\`\`\n- **네거티브**: 공통 네거티브${NEG_EXTRA[e.kind] ? ' + `' + NEG_EXTRA[e.kind] + '`' : ''}\n`;
   });
 });
 fs.writeFileSync(path.join(ROOT, 'docs/IMAGE_PROMPTS.md'), md);
-console.log(`docs/IMAGE_PROMPTS.md: ${entries.length}개 항목`);
+console.log(`docs/IMAGE_PROMPTS.md: 필수 ${required.length}회 (선택 ${optional.length}회), 표정 ${exprTotal}종 → 시트 ${sheetEntries.length}장`);
 groups.forEach((g) => console.log('  ' + g + ': ' + entries.filter((e) => e.group === g).length));

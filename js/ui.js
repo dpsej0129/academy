@@ -359,7 +359,7 @@
         var c = existing[id] || el('div', 'char');
         c.setAttribute('data-id', id);
         c.style.left = (POS[sh.pos] || 50) + '%';
-        G.Assets.fill(c, 'assets/char/' + id + '_' + sh.expr + '.png', info.name + '\n(' + (EXPR[sh.expr] || sh.expr) + ')', info.color);
+        G.Assets.fillChar(c, id, sh.expr, info.name + '\n(' + (EXPR[sh.expr] || sh.expr) + ')', info.color, 'full');
         if (!existing[id]) layer.appendChild(c);
         delete existing[id];
       });

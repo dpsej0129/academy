@@ -71,7 +71,7 @@
           if (!isAvail && p.members.indexOf(id) < 0 && p.dead.indexOf(id) < 0) return; // 아직 만나지 않음
           var card = el('div', 'fcard' + (chosen.indexOf(id) >= 0 ? ' sel' : '') + (forced.indexOf(id) >= 0 ? ' locked' : '') + (isAvail ? '' : ' unavailable'));
           var pf = el('div', 'pf');
-          G.Assets.fill(pf, 'assets/portrait/' + id + '.png', c.name, c.color);
+          G.Assets.fillChar(pf, id, 'normal', c.name, c.color, 'bust');
           card.appendChild(pf);
           var meta = el('div', 'meta');
           var lvl = def.level || 1;
@@ -265,7 +265,8 @@
       card.setAttribute('data-uid', u.uid);
       var top = el('div', 'top');
       var pt = el('div', 'pt');
-      G.Assets.fill(pt, u.portrait, u.name, u.color);
+      if (u.side === 'ally') G.Assets.fillChar(pt, u.id, 'normal', u.name, u.color, 'bust');
+      else G.Assets.fill(pt, u.portrait, u.name, u.color);
       top.appendChild(pt);
       var nm = el('div', '');
       var sub = u.side === 'ally' ? elemTag(u.element) : ({ mob: '일반', elite: '정예', boss: '보스', part: '부위' }[u.tier] || '') + (u.intercept ? ' · 반격 태세' : '');

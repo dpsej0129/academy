@@ -58,6 +58,7 @@
 
   // ---------- 에셋: 파일이 없으면 색 블록 + 이름 텍스트 ----------
   var cache = {}; // path -> 'ok' | 'fail' | Promise
+  var imgs = {};  // path -> 불러온 Image (표정 시트 자르기용)
   G.Assets = {
     /** 매니페스트(data/assets.js)에 등록된 파일만 불러온다. 없는 파일을 요청하면 브라우저 콘솔에 404 에러가 찍히기 때문. */
     listed: function (path) {
@@ -74,6 +75,7 @@
       if (cache[path] && cache[path].push) { cache[path].push(cb); return; }
       cache[path] = [cb];
       var img = new Image();
+      imgs[path] = img;
       img.onload = function () { var l = cache[path]; cache[path] = 'ok'; l.forEach(function (f) { f(true); }); };
       img.onerror = function () { var l = cache[path]; cache[path] = 'fail'; l.forEach(function (f) { f(false); }); };
       img.src = path;
@@ -89,6 +91,8 @@
       lab.textContent = label || '';
       el.classList.add('placeholder');
       el.style.backgroundImage = '';
+      var oldCv = el.querySelector('canvas.sheet-cv');
+      if (oldCv) oldCv.remove();
       G.Assets.probe(path, function (ok) {
         if (el.getAttribute('data-src') !== (path || '')) return; // 그 사이 바뀜
         if (ok) {
@@ -97,6 +101,55 @@
         }
       });
       return el;
+    },
+    /** 표정 시트 배치: 표정 수 → 열·행. 표정은 인물 데이터의 expressions 순서대로 왼쪽→오른쪽, 위→아래.
+     *  1~3개: 한 줄 / 4개: 2×2 / 5~6개: 3×2 (5개면 마지막 칸은 비움) */
+    sheetLayout: function (n) {
+      var cols = n <= 3 ? n : (n === 4 ? 2 : 3);
+      return { cols: cols, rows: Math.ceil(n / cols) };
+    },
+    sheetPath: function (id) { return 'assets/char/' + id + '_sheet.png'; },
+    /** 인물 이미지 채우기. mode: 'full'(스탠딩) | 'bust'(전투·편성 초상화)
+     *  우선순위: 개별 파일(char/<id>_<표정>.png 또는 portrait/<id>.png) → 표정 시트(char/<id>_sheet.png) → 대체 블록 */
+    fillChar: function (el, id, expr, label, color, mode) {
+      mode = mode || 'full';
+      var single = mode === 'bust' ? 'assets/portrait/' + id + '.png' : 'assets/char/' + id + '_' + expr + '.png';
+      if (G.Assets.listed(single)) return G.Assets.fill(el, single, label, color);
+      var sheet = G.Assets.sheetPath(id);
+      G.Assets.fill(el, '', label, color);
+      var key = sheet + '#' + expr + '#' + mode;
+      el.setAttribute('data-src', key);
+      if (!G.Assets.listed(sheet)) return el;
+      var D = root.GameData, c = (D.characters && D.characters[id]) || (D.npcs && D.npcs[id]);
+      var list = (c && c.expressions) || ['normal'];
+      var idx = Math.max(0, list.indexOf(expr));
+      var layout = G.Assets.sheetLayout(list.length);
+      G.Assets.probe(sheet, function (ok) {
+        if (!ok || el.getAttribute('data-src') !== key) return;
+        G.Assets.drawCell(el, imgs[sheet], layout, idx, mode);
+      });
+      return el;
+    },
+    /** 시트의 한 칸을 캔버스로 잘라 엘리먼트에 얹는다. (file://에서도 화면 표시는 가능) */
+    /** 시트 크기·배치·칸 번호 → 잘라 낼 영역 {sx, sy, sw, sh}. 'bust'는 칸 위쪽의 머리~어깨 정사각형. */
+    cellRect: function (w, h, layout, index, mode) {
+      var cw = w / layout.cols, ch = h / layout.rows;
+      var r = { sx: (index % layout.cols) * cw, sy: Math.floor(index / layout.cols) * ch, sw: cw, sh: ch };
+      if (mode === 'bust') {
+        var side = cw * 0.62;
+        r.sx += (cw - side) / 2; r.sy += ch * 0.03; r.sw = side; r.sh = side;
+      }
+      return r;
+    },
+    drawCell: function (el, img, layout, index, mode) {
+      var r = G.Assets.cellRect(img.naturalWidth, img.naturalHeight, layout, index, mode);
+      var sx = r.sx, sy = r.sy, sw = r.sw, sh = r.sh;
+      var cv = el.querySelector('canvas.sheet-cv');
+      if (!cv) { cv = document.createElement('canvas'); el.appendChild(cv); }
+      cv.className = 'sheet-cv ' + mode;
+      cv.width = Math.max(1, Math.round(sw)); cv.height = Math.max(1, Math.round(sh));
+      cv.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+      el.classList.remove('placeholder');
     },
     make: function (tag, cls, path, label, color) {
       var el = document.createElement(tag || 'div');

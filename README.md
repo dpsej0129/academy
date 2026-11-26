@@ -147,7 +147,7 @@ data/                   ★ 코드를 고치지 않고 수정 가능한 데이�
 assets/                 이미지 자리 (bg, char, portrait, cutin, enemy, cg, title, ui)
 docs/
   STORY_BIBLE.md        세계관·인물·플롯·복선 표
-  IMAGE_PROMPTS.md      이미지 187장 목록과 프롬프트
+  IMAGE_PROMPTS.md      이미지 목록과 프롬프트 (필수 135회 실행, 선택 6회)
 tools/                  검증·생성 도구 (Node 18+)
 tests/                  엔진 단위 테스트, 브라우저 통합 테스트
 ```
@@ -182,6 +182,8 @@ if(flag.mocked) 비비안: …                       조건부 줄
 1. [`docs/IMAGE_PROMPTS.md`](docs/IMAGE_PROMPTS.md)의 경로 그대로 PNG를 저장한다. (공통 스타일 문구가 맨 위에 있다)
 2. `node tools/scan_assets.js` 실행 → `data/assets.js` 갱신. (Node가 없으면 `files` 배열에 직접 경로 추가)
 3. 새로고침. 이미지가 없는 항목은 계속 색 블록 + 이름으로 표시된다.
+
+**인물은 표정 시트 한 장으로 충분하다.** 인물 한 명의 표정 3~6종을 프롬프트 1번으로 한 장(`assets/char/<ID>_sheet.png`)에 받으면, 게임이 칸을 잘라 표정별 스탠딩과 전투 초상화로 쓴다. 표정 62종을 따로 뽑으면 62번이지만 시트로는 16번이면 된다. 칸 배치(표정 1~3개는 한 줄, 4개는 2×2, 5~6개는 3×2)와 인물별 칸 순서는 `docs/IMAGE_PROMPTS.md`의 「표정 시트 사용법」에 있다. 개별 파일(`<ID>_<표정>.png`, `portrait/<ID>.png`)이 있으면 시트보다 우선한다.
 
 > 매니페스트를 쓰는 이유: 없는 이미지를 요청하면 브라우저 콘솔에 404 에러가 찍힌다. 매니페스트에 있는 파일만 불러와 콘솔 에러를 0으로 유지한다.
 

@@ -156,4 +156,26 @@ test('모든 전투가 자동 전투로 끝까지 진행된다 (무한 루프 �
   });
 });
 
+test('표정 시트: 표정 수별 배치와 칸 좌표', () => {
+  const A = Game.Assets;
+  assert.deepStrictEqual(A.sheetLayout(3), { cols: 3, rows: 1 });
+  assert.deepStrictEqual(A.sheetLayout(4), { cols: 2, rows: 2 });
+  assert.deepStrictEqual(A.sheetLayout(5), { cols: 3, rows: 2 });
+  assert.deepStrictEqual(A.sheetLayout(6), { cols: 3, rows: 2 });
+  // 3x2 시트(2160x2560)의 5번째 표정(index 4) = 2행 2열
+  const r = A.cellRect(2160, 2560, A.sheetLayout(5), 4, 'full');
+  assert.deepStrictEqual(r, { sx: 720, sy: 1280, sw: 720, sh: 1280 });
+  // 2x2 시트의 3번째(index 2) = 2행 1열
+  const r2 = A.cellRect(1440, 2560, A.sheetLayout(4), 2, 'full');
+  assert.deepStrictEqual([r2.sx, r2.sy], [0, 1280]);
+  // 초상화는 첫 칸 위쪽 중앙의 정사각형
+  const b = A.cellRect(2160, 2560, A.sheetLayout(5), 0, 'bust');
+  assert.ok(b.sw === b.sh && b.sx > 0 && b.sx + b.sw < 720 && b.sy < 1280 * 0.1);
+  // 모든 인물의 표정 수가 시트 칸 안에 들어간다
+  Object.values(GameData.characters).concat(Object.values(GameData.npcs)).forEach((c) => {
+    const l = A.sheetLayout(c.expressions.length);
+    assert.ok(l.cols * l.rows >= c.expressions.length && c.expressions.length >= 3, c.name);
+  });
+});
+
 console.log(`\n${passed}개 테스트 통과`);
